@@ -90,7 +90,7 @@ allProductFiltered["Fruit"] = productList.filter(
 
 ///////////////////////////////////////////////
 //DISPLAY FUNCTION
-//Displaying category
+//Function: Displaying category
 let categoryDisplay = "";
 let numb = 1;
 for (category in allProductFiltered) {
@@ -98,16 +98,18 @@ for (category in allProductFiltered) {
   numb += 1;
 }
 
-//Displaying product in each category
+//Function: Displaying product in each category
 let displayingProduct = (category) => {
   let selectCategory = "";
   allProductFiltered[category].forEach((product, index) => {
-    selectCategory += `${index + 1}. ${product.name}: $${product.price}\n`;
+    selectCategory += `${index + 1}. ${product.name}: $${
+      product.price
+    } | Stock: ${product.stock}\n`;
   });
   return selectCategory;
 };
 
-//Alert updated product in each category (add/remove product)
+//Function: Alert updated product in each category (add/remove product)
 let displayUpdateProduct = (category) => {
   allProductFiltered[category] = productList.filter(
     (product) => product.category == category
@@ -115,7 +117,21 @@ let displayUpdateProduct = (category) => {
   alert(displayingProduct(category));
 };
 
-//Displaying cart
+//Function: Remove product
+let removeProduct = (category) => {
+  let removedProduct = prompt(displayingProduct(category));
+  productList.forEach((product, index) => {
+    if (
+      product.name ==
+      allProductFiltered[category][Number(removedProduct) - 1].name
+    ) {
+      productList.splice(index, 1);
+    }
+  });
+  displayUpdateProduct(category);
+};
+
+//Function: Displaying cart
 let cart = [];
 let displayingCart = () => {
   let cartDisplay = "";
@@ -125,6 +141,75 @@ let displayingCart = () => {
     } = $${product.quantity * product.price}\n`;
   });
   return cartDisplay;
+};
+
+//Function: Buy product
+let buyProduct = (category) => {
+  let selectedProduct = prompt(displayingProduct(category));
+  productList.forEach((product, index) => {
+    if (
+      product.name ==
+      allProductFiltered[category][Number(selectedProduct) - 1].name
+    ) {
+      //Insert quantity
+      while (true) {
+        let quantity = Number(
+          prompt(`How many ${productList[index].name} do you want to buy?`)
+        );
+
+        let marginQuantity = product.stock - quantity;
+        if (marginQuantity < 0) {
+          //quantity more than product stock
+          alert(`The stock only ${product.stock}, please insert new quantity.`);
+        } else {
+          //update stock in product list
+          product.stock -= quantity;
+
+          //insert to cart
+          cart.push(product);
+          product.quantity = quantity;
+          break;
+        }
+      }
+
+      //ask wheter the user want to continue shopping or checkout
+      let cartNext = prompt(
+        `${displayingCart()} \nDo you want to continue shopping? \n1. Continue shopping \n2.Checkout`
+      );
+
+      //Checkout
+      if (cartNext == 2) {
+        let totalCheckout = 0;
+        cart.forEach((product) => {
+          totalCheckout += product.price * product.quantity;
+        });
+
+        while (true) {
+          let payment = prompt(
+            `${displayingCart()}\n TOTAL = $${totalCheckout}\nPlease insert your payment:`
+          );
+
+          let margin = payment - totalCheckout;
+          if (margin < 0) {
+            alert(
+              `Your payment need $${Math.abs(
+                margin
+              )} more, please insert new amount.`
+            );
+          } else if (margin > 0) {
+            alert(`Thank you for your order, your change is $${margin}.`);
+            break;
+          } else {
+            alert("Thank you for your order!");
+            break;
+          }
+        }
+
+        //Empty the cart
+        cart = [];
+      }
+    }
+  });
 };
 
 ///////////////////////////////////////////////
@@ -244,82 +329,35 @@ while (true) {
 
     switch (Number(displayCategoryMenu)) {
       case 1:
-        let removedProduct = prompt(displayingProduct("Fast Food"));
-        productList.forEach((product, index) => {
-          if (
-            product.name ==
-            allProductFiltered["Fast Food"][Number(removedProduct) - 1].name
-          ) {
-            productList.splice(index, 1);
-          }
-        });
-        displayUpdateProduct("Fast Food");
+        removeProduct("Fast Food");
+        break;
+      case 2:
+        removeProduct("Cloth");
+        break;
+      case 3:
+        removeProduct("Electronic");
+        break;
+      case 4:
+        removeProduct("Fruit");
         break;
     }
   } else if (mainMenu == 4) {
+    let menu4 = true;
     //Choose products to buy
-    while (true) {
+    while (menu4) {
       //Ask product category -> Show category list
       let displayCategoryMenu = prompt(
-        `Please choose a category: \n${categoryDisplay}`
+        `Please choose a category: \n${categoryDisplay} ${menu4}`
       );
 
       //Choose product in the category
       switch (Number(displayCategoryMenu)) {
         case 1:
-          let buyProduct = prompt(displayingProduct("Fast Food"));
-          productList.forEach((product, index) => {
-            if (
-              product.name ==
-              allProductFiltered["Fast Food"][Number(buyProduct) - 1].name
-            ) {
-              let quantity = Number(
-                prompt(
-                  `How many ${productList[index].name} do you want to buy?`
-                )
-              );
-              cart.push(product);
-              product.quantity = quantity;
-              let cartNext = prompt(
-                `${displayingCart()} \nDo you want to continue shopping? \n1. Continue shopping \n2.Checkout`
-              );
-
-              if (cartNext == 2) {
-                //Checkout
-                let totalCheckout = 0;
-                cart.forEach((product) => {
-                  totalCheckout += product.price * product.quantity;
-                });
-
-                while (true) {
-                  let payment = prompt(
-                    `${displayingCart()}\n TOTAL = $${totalCheckout}\nPlease insert your payment:`
-                  );
-
-                  let margin = payment - totalCheckout;
-                  if (margin < 0) {
-                    alert(
-                      `Your payment need $${Math.abs(
-                        margin
-                      )} more, please insert new amount.`
-                    );
-                  } else if (margin > 0) {
-                    alert(
-                      `Thank you for your order, your change is $${margin}.`
-                    );
-                    break;
-                  } else {
-                    alert("Thank you for your order!");
-                    break;
-                  }
-                }
-
-                //Empty the cart
-                cart = [];
-              }
-            }
-          });
+          buyProduct("Fast Food");
+          menu4 = false;
       }
     }
+  } else if (mainMenu == 5) {
+    alert("Thank you!");
   }
 }
