@@ -104,7 +104,22 @@ let displayingProduct = (category) => {
   allProductFiltered[category].forEach((product, index) => {
     selectCategory += `${index + 1}. ${product.name}: $${
       product.price
-    } | Stock: ${product.stock}\n`;
+    } | Stock: ${product.stock} `;
+
+    //add product information depends on the category
+    if (category == "Fast Food") {
+      selectCategory += `(Expired in: ${product.expired} year)\n`;
+    } else if (category == "Cloth") {
+      selectCategory += `(Size: ${product.size})\n`;
+    } else if (category == "Electronic") {
+      if (product.warranty == true) {
+        selectCategory += `(With warranty)\n`;
+      } else {
+        selectCategory += `(No warranty)\n`;
+      }
+    } else if (category == "Fruit") {
+      selectCategory += `(Sugar level: ${product.sugarLevel})\n`;
+    }
   });
   return selectCategory;
 };
@@ -198,9 +213,11 @@ let buyProduct = (category) => {
             );
           } else if (margin > 0) {
             alert(`Thank you for your order, your change is $${margin}.`);
+            menu4 = false;
             break;
           } else {
             alert("Thank you for your order!");
+            menu4 = false;
             break;
           }
         }
@@ -214,11 +231,15 @@ let buyProduct = (category) => {
 
 ///////////////////////////////////////////////
 //MARKET APP
+let menu4 = true; //for 'while' in buy product menu
+
 while (true) {
   //select menu
   let mainMenu = prompt(
     "Welcome! \nPlease select the menu below:\n1. Display products \n2. Add products \n3. Remove products \n4. Buy products \n5. Exit"
   );
+
+  //let menu4 = true --> was here before, but get error
 
   if (mainMenu == 1) {
     //Ask which category want to display
@@ -240,6 +261,8 @@ while (true) {
       case 4:
         alert(displayingProduct("Fruit"));
         break;
+      default:
+        alert("Please choose the right category");
     }
   } else if (mainMenu == 2) {
     //Ask product category -> Show category list
@@ -320,6 +343,8 @@ while (true) {
 
         displayUpdateProduct("Fruit");
         break;
+      default:
+        alert("Please choose the right category");
     }
   } else if (mainMenu == 3) {
     //Ask product category -> Show category list
@@ -340,21 +365,34 @@ while (true) {
       case 4:
         removeProduct("Fruit");
         break;
+      default:
+        alert("Please choose the right category");
     }
   } else if (mainMenu == 4) {
-    let menu4 = true;
+    //let menu4 = true --> was here before, but get error
     //Choose products to buy
     while (menu4) {
       //Ask product category -> Show category list
       let displayCategoryMenu = prompt(
-        `Please choose a category: \n${categoryDisplay} ${menu4}`
+        `Please choose a category: \n${categoryDisplay}`
       );
 
       //Choose product in the category
       switch (Number(displayCategoryMenu)) {
         case 1:
           buyProduct("Fast Food");
-          menu4 = false;
+          break;
+        case 2:
+          buyProduct("Cloth");
+          break;
+        case 3:
+          buyProduct("Electronic");
+          break;
+        case 4:
+          buyProduct("Fruit");
+          break;
+        default:
+          alert("Please choose the right category");
       }
     }
   } else if (mainMenu == 5) {
